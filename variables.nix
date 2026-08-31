@@ -5,8 +5,13 @@
   username = "user";
   timezone = "Africa/Cairo";
 
-  # Storage / State
+  # Storage / State & Swap
   stateVersion = "26.05";
+  swap = {
+    enable = true;          # Enable declarative swapfile
+    size = 4096;            # Size in MiB (e.g. 4096 = 4GB, 8192 = 8GB)
+    path = "/var/lib/swapfile";
+  };
 
   # Containerized Environment Stack
   containers = {

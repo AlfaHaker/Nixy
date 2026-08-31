@@ -16,7 +16,7 @@ in {
     ./containers
     ./proxies
     ./tty
-  ];
+  ] ++ (if (vars ? swap && vars.swap.enable) then [ ./swap.nix ] else [ ]);
 
   # Basic System Settings
   system.stateVersion = vars.stateVersion;

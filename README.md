@@ -24,6 +24,7 @@ Instead of writing sprawling, interdependent Nix configurations, **Nixy** centra
 ├── configuration.nix           # Main system coordinator
 ├── variables.nix               # Central control panel (Containers, Proxy, Shell, Hostname)
 ├── hardware-configuration.nix   # Auto-generated system hardware spec
+├── swap.nix                    # Declarative swapfile management
 ├── users.nix                   # User accounts, dynamic groups, authorized keys
 ├── ssh.nix                     # Hardened OpenSSH daemon settings
 ├── services.nix                # Fail2ban, QEMU agent, timesyncd, log retention
@@ -64,17 +65,24 @@ Open `variables.nix` and set your desired environment:
   timezone = "Africa/Cairo";
   stateVersion = "26.05";
 
-  # 2. Containers (Docker & Incus can coexist)
+  # 2. Swap Configuration
+  swap = {
+    enable = true;          # Declarative swapfile
+    size = 4096;            # Size in MiB (4096 = 4GB)
+    path = "/var/lib/swapfile";
+  };
+
+  # 3. Containers (Docker & Incus can coexist)
   containers = {
     docker = true;          # Docker engine + compose + lazydocker
     dockerDataRoot = "/var/lib/docker"; # Custom storage location
     incus = true;           # Incus LXC containers & KVM virtual machines
   };
 
-  # 3. Reverse Proxy ("caddy" | "traefik" | "nginx" | "none")
+  # 4. Reverse Proxy ("caddy" | "traefik" | "nginx" | "none")
   proxy = "caddy";
 
-  # 4. Shell Stack ("zsh" | "bash" | "fish")
+  # 5. Shell Stack ("zsh" | "bash" | "fish")
   shell = "zsh";
   zellij = true;            # Terminal multiplexer
   herdr = true;             # Herdr agent runtime & workspace manager
@@ -141,7 +149,7 @@ nixos-generate-config --root /mnt
 ```
 
 #### Step 4: Customize Variables & SSH Keys
-1. Open `/mnt/etc/nixos/variables.nix` and configure your `hostname`, `username`, and `timezone`.
+1. Open `/mnt/etc/nixos/variables.nix` and configure your `hostname`, `username`, `timezone`, and `swap` settings.
 2. Open `/mnt/etc/nixos/users.nix` and `/mnt/etc/nixos/ssh.nix` to insert your public SSH keys.
 3. Toggle container engines (`docker`, `incus`), proxy (`caddy`, `traefik`, `nginx`, `none`), and shell preference.
 
@@ -179,7 +187,7 @@ sudo mv /tmp/hardware-configuration.nix /etc/nixos/hardware-configuration.nix
 ```
 
 #### Step 3: Customize Variables & User
-1. Open `/etc/nixos/variables.nix` and set your `hostname`, `username`, `timezone`, and features.
+1. Open `/etc/nixos/variables.nix` and set your `hostname`, `username`, `timezone`, `swap`, and feature toggles.
 2. Open `/etc/nixos/users.nix` and `/etc/nixos/ssh.nix` to verify your user and SSH keys.
 
 #### Step 4: Build & Switch

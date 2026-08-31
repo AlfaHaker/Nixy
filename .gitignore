@@ -1,0 +1,6 @@
+# Git ignore rules for Nixy
+.agents/
+result
+result-*
+*.qcow2
+*.iso

@@ -99,16 +99,16 @@ Nixy allows **Docker** and **Incus** to run side-by-side without network isolati
 
 ---
 
-## 🛠️ Fresh Installation Guide
+## 🛠️ Installation & Deployment
 
-Follow these steps to deploy **Nixy** on a fresh baremetal server or VPS (Proxmox, Hetzner, Contabo, DigitalOcean, etc.).
+<details>
+<summary><b>Scenario A: Fresh Installation from Live ISO (Baremetal / VPS)</b></summary>
 
-### Step 1: Boot into the NixOS Minimal Installer
+<br>
 
-Boot the machine using the official [NixOS Minimal ISO](https://nixos.org/download.html).
+Follow these steps when installing NixOS and Nixy from the official [NixOS Minimal ISO](https://nixos.org/download.html).
 
-### Step 2: Partition, Format, and Mount
-
+#### Step 1: Partition, Format, and Mount
 *(Example for UEFI / GPT with Ext4)*:
 
 ```bash
@@ -128,40 +128,70 @@ mkdir -p /mnt/boot
 mount /dev/disk/by-label/boot /mnt/boot
 ```
 
-### Step 3: Generate Hardware Configuration
-
-Run `nixos-generate-config` to generate your hardware configuration:
-
+#### Step 2: Clone Nixy Configuration
 ```bash
+# Clone Nixy repository directly into /mnt/etc/nixos
+git clone https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
+```
+
+#### Step 3: Generate Hardware Configuration
+```bash
+# Generate hardware configuration inside /mnt/etc/nixos
 nixos-generate-config --root /mnt
 ```
 
-### Step 4: Clone / Copy Nixy Configuration
+#### Step 4: Customize Variables & SSH Keys
+1. Open `/mnt/etc/nixos/variables.nix` and configure your `hostname`, `username`, and `timezone`.
+2. Open `/mnt/etc/nixos/users.nix` and `/mnt/etc/nixos/ssh.nix` to insert your public SSH keys.
+3. Toggle container engines (`docker`, `incus`), proxy (`caddy`, `traefik`, `nginx`, `none`), and shell preference.
 
-Copy the Nixy stack to `/mnt/etc/nixos`:
-
+#### Step 5: Install & Reboot
 ```bash
-# Copy Nixy files into /mnt/etc/nixos
-cp -r /path/to/Nixy/* /mnt/etc/nixos/
-
-# (The hardware-configuration.nix generated in Step 3 will be preserved)
-```
-
-### Step 5: Customize Variables & SSH Keys
-
-1. Open `/mnt/etc/nixos/variables.nix` and set your `hostname`, `username`, and `timezone`.
-2. Open `/mnt/etc/nixos/users.nix` and `/mnt/etc/nixos/ssh.nix` to add your public SSH keys for your primary user and root respectively.
-3. Toggle your desired container engines (`docker`, `incus`), proxy (`caddy`, `traefik`, `nginx`, `none`), and default shell (`zsh`, `bash`, `fish`) in `variables.nix`.
-
-### Step 6: Install & Reboot
-
-```bash
-# Set a root password if desired
 nixos-install
-
-# Reboot into your new Nixy server
 reboot
 ```
+
+</details>
+
+<details>
+<summary><b>Scenario B: Existing / Freshly Installed NixOS System</b></summary>
+
+<br>
+
+If you already have a running NixOS installation (e.g., a VPS cloud image or a fresh minimal install) and want to apply Nixy:
+
+#### Step 1: Backup Existing Configuration
+```bash
+sudo cp -r /etc/nixos /etc/nixos.bak
+```
+
+#### Step 2: Clone Nixy & Preserve Hardware Configuration
+```bash
+# Move hardware-configuration.nix temporarily
+sudo mv /etc/nixos/hardware-configuration.nix /tmp/hardware-configuration.nix
+sudo rm -rf /etc/nixos
+
+# Clone Nixy into /etc/nixos
+sudo git clone https://github.com/AlfaHaker/Nixy.git /etc/nixos
+
+# Restore your hardware configuration
+sudo mv /tmp/hardware-configuration.nix /etc/nixos/hardware-configuration.nix
+```
+
+#### Step 3: Customize Variables & User
+1. Open `/etc/nixos/variables.nix` and set your `hostname`, `username`, `timezone`, and features.
+2. Open `/etc/nixos/users.nix` and `/etc/nixos/ssh.nix` to verify your user and SSH keys.
+
+#### Step 4: Build & Switch
+```bash
+# Test build first (optional)
+sudo nixos-rebuild test
+
+# Apply and switch to Nixy
+sudo nixos-rebuild switch
+```
+
+</details>
 
 ---
 

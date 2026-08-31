@@ -23,5 +23,6 @@
   # Options: "bash" | "zsh" | "fish"
   shell = "zsh";
   zellij = true;            # Enable Zellij terminal multiplexer
+  herdr = true;             # Enable Herdr agent runtime & terminal manager
   header = true;            # Enable fastfetch MOTD banner on login
 }

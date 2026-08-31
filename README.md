@@ -12,7 +12,7 @@ Instead of writing sprawling, interdependent Nix configurations, **Nixy** centra
 - 📦 **Container Stack**: Independent switches for **Docker** (with Compose & Lazydocker) and **Incus** (LXC & KVM virtualization).
 - 🌐 **Reverse Proxy Stack**: Native NixOS services for **Caddy**, **Traefik**, and **Nginx** (or `none`).
 - 🛡️ **Direct Network Stack**: Hardened firewall, bridge interface routing (`docker0`, `incusbr0`), DNS, and kernel sysctl optimizations managed directly in `network/`.
-- 💻 **TTY & Shell Stack**: Choose between **Bash**, **Zsh** (with autosuggestions & syntax highlighting), or **Fish**, plus **Zellij** multiplexer and **Fastfetch** login headers.
+- 💻 **TTY & Shell Stack**: Choose between **Bash**, **Zsh** (with autosuggestions & syntax highlighting), or **Fish**, plus **Zellij** multiplexer, **Herdr** agent runtime, and **Fastfetch** login headers.
 - 🔒 **Dedicated Security Modules**: Independent `ssh.nix`, `users.nix`, `services.nix`, and an extensively annotated `systempackages.nix`.
 
 ---
@@ -46,7 +46,7 @@ Instead of writing sprawling, interdependent Nix configurations, **Nixy** centra
     ├── bash.nix                # Configured when shell = "bash"
     ├── zsh.nix                 # Configured when shell = "zsh"
     ├── fish.nix                # Configured when shell = "fish"
-    ├── zellij.nix              # Configured when zellij = true
+    ├── multiplexer.nix         # Configured when zellij or herdr = true
     └── header.nix              # Fastfetch banner when header = true
 ```
 
@@ -77,6 +77,7 @@ Open `variables.nix` and set your desired environment:
   # 4. Shell Stack ("zsh" | "bash" | "fish")
   shell = "zsh";
   zellij = true;            # Terminal multiplexer
+  herdr = true;             # Herdr agent runtime & workspace manager
   header = true;            # Fastfetch MOTD banner
 }
 ```

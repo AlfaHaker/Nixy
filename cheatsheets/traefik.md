@@ -81,43 +81,38 @@ services.traefik.dynamicConfigOptions.http.routers.plain-http = {
 
 ## 🏠 Scenario B: Local Network (Private LAN, VPN & Homelab)
 
-### 1. HTTPS with Self-Signed / Custom SSL Certificate
+### 1. HTTPS with Auto-Generated Self-Signed SSL
 
-#### Configure Custom Certificate in `proxies/traefik.nix`:
-```nix
-services.traefik.dynamicConfigOptions = {
-  # Register local custom or self-signed certificates
-  tls.certificates = [
-    {
-      certFile = "/var/lib/ssl/local.crt";
-      keyFile = "/var/lib/ssl/local.key";
-    }
-  ];
+Traefik has a built-in feature: when you enable `tls` on an HTTPS router **without specifying a cert resolver**, Traefik **automatically generates a self-signed default TLS certificate** on the fly for your local domain (`.lan`, `.local`) or private IP.
 
-  http.routers.secure-local = {
-    rule = "Host(`dashboard.local.lan`)";
-    entryPoints = [ "websecure" ];
-    service = "local-backend";
-    tls = { }; # Uses local certificate store above
-  };
-
-  http.services.local-backend.loadBalancer.servers = [
-    { url = "http://127.0.0.1:9090"; }
-  ];
-};
-```
-
-#### Docker Compose Label with Local TLS:
+#### Method 1: Auto-Generated Self-Signed SSL via Docker Labels
 ```yaml
 services:
-  local-secure-container:
+  local-secure-app:
     image: my-app:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.localsecure.rule=Host(`secure.local.lan`)"
+      - "traefik.http.routers.localsecure.rule=Host(`dashboard.local.lan`)"
       - "traefik.http.routers.localsecure.entrypoints=websecure"
+      # Omit certresolver to use Traefik's auto-generated self-signed cert
       - "traefik.http.routers.localsecure.tls=true"
       - "traefik.http.services.localsecure.loadbalancer.server.port=8080"
+```
+
+#### Method 2: Auto-Generated Self-Signed SSL via `proxies/traefik.nix`
+```nix
+services.traefik.dynamicConfigOptions.http = {
+  routers.secure-local = {
+    rule = "Host(`dashboard.local.lan`)";
+    entryPoints = [ "websecure" ];
+    service = "local-backend";
+    tls = { }; # Auto-generates self-signed TLS certificate
+  };
+
+  services.local-backend.loadBalancer.servers = [
+    { url = "http://127.0.0.1:9090"; }
+  ];
+};
 ```
 
 ---

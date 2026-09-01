@@ -46,13 +46,22 @@ services.nginx.virtualHosts."public-mirror.yourdomain.com" = {
 
 ## 🏠 Scenario B: Local Network (Private LAN, VPN & Homelab)
 
-### 1. HTTPS with Self-Signed / Custom SSL Certificate
-For `.lan`, `.local`, or internal mesh networks where Let's Encrypt cannot verify domain ownership.
+### 1. HTTPS with Self-Signed SSL Certificate
 
-In `proxies/nginx.nix`:
+#### Step 1: Generate Self-Signed Certificate (One-Liner)
+Generate a wildcard self-signed certificate for your local network:
+```bash
+sudo mkdir -p /var/lib/ssl
+sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+  -keyout /var/lib/ssl/local.key \
+  -out /var/lib/ssl/local.crt \
+  -subj "/CN=*.local.lan"
+```
+
+#### Step 2: Configure Virtual Host in `proxies/nginx.nix`
 ```nix
 services.nginx.virtualHosts."dashboard.local.lan" = {
-  addSSL = true; # Enable SSL on 443 without ACME
+  addSSL = true; # Enable SSL on port 443 without Let's Encrypt
   sslCertificate = "/var/lib/ssl/local.crt";
   sslCertificateKey = "/var/lib/ssl/local.key";
 
@@ -62,6 +71,8 @@ services.nginx.virtualHosts."dashboard.local.lan" = {
   };
 };
 ```
+
+---
 
 ### 2. Plain HTTP (Local LAN, Port Binding & Subnet Whitelist)
 Unencrypted HTTP virtual host bound to local domains or specific LAN IP addresses.

@@ -161,8 +161,11 @@ sudo mount /dev/disk/by-label/boot /mnt/boot --mkdir
 #### Step 2: Clone Nixy Configuration
 
 ```bash
-# Clone Nixy repository directly into /mnt/etc/nixos
+# Clone Nixy repository (main branch by default):
 git clone https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
+
+# Or clone the cutting-edge dev branch:
+# git clone -b dev https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
 ```
 
 #### Step 3: Generate Hardware Configuration
@@ -207,8 +210,11 @@ sudo cp -r /etc/nixos /etc/nixos.bak
 sudo mv /etc/nixos/hardware-configuration.nix /tmp/hardware-configuration.nix 2>/dev/null || sudo mv /etc/nixos/system/hardware-configuration.nix /tmp/hardware-configuration.nix
 sudo rm -rf /etc/nixos
 
-# Clone Nixy into /etc/nixos
+# Clone Nixy repository (main branch by default):
 sudo git clone https://github.com/AlfaHaker/Nixy.git /etc/nixos
+
+# Or clone the cutting-edge dev branch:
+# sudo git clone -b dev https://github.com/AlfaHaker/Nixy.git /etc/nixos
 
 # Restore your hardware configuration into system/
 sudo mv /tmp/hardware-configuration.nix /etc/nixos/system/hardware-configuration.nix

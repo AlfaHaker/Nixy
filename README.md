@@ -137,8 +137,8 @@ sudo mkfs.ext4 -L nixos /dev/sda2
 
 # 3. Mount filesystems
 sudo mount /dev/disk/by-label/nixos /mnt
-sudo mkdir -p /mnt/boot
-sudo mount /dev/disk/by-label/boot /mnt/boot
+
+sudo mount /dev/disk/by-label/boot /mnt/boot --mkdir
 ```
 
 #### Step 2: Clone Nixy Configuration

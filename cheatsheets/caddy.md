@@ -1,93 +1,91 @@
-# Caddy Configuration Cheatsheet
+# Caddy Proxy Cheatsheet
 
-This guide covers configuring **Caddy** in Nixy for both **Public Domains (with Automatic Let's Encrypt SSL)** and **Local LAN / Private Networks (Plain HTTP or Self-Signed Internal TLS)**.
+This cheatsheet provides practical, copy-pasteable configuration patterns for **Caddy** across four core network scenarios.
 
 ---
 
-## 🌐 Part 1: Public SSL Configuration (Production & Internet-Facing)
+## 🌐 Scenario A: Public Network (Internet-Facing)
 
-Caddy automatically handles Let's Encrypt / ZeroSSL certificate issuance, verification, and renewals out of the box when a public domain is configured.
+### 1. HTTPS with Automatic SSL (Let's Encrypt / ZeroSSL)
+Caddy automatically handles public ACME verification, certificate renewals, and forces HTTPS redirects.
 
-### 1. Basic Reverse Proxy with Auto HTTPS
-Edit `proxies/caddy.nix`:
+In `proxies/caddy.nix`:
 ```nix
 services.caddy = {
   enable = true;
   extraConfig = ''
-    # Public domain reverse proxy
+    # Public domain with auto-HTTPS & WebSocket reverse proxy
     app.yourdomain.com {
       reverse_proxy 127.0.0.1:3000
     }
 
-    # Proxy with WebSocket support (e.g. Nextcloud, Node.js, WebSockets)
-    chat.yourdomain.com {
-      reverse_proxy 127.0.0.1:8000
+    # Multiple subdomains on the same host
+    api.yourdomain.com {
+      reverse_proxy 127.0.0.1:4000
     }
   '';
 };
 ```
 
-### 2. Global ACME Email Registration
+### 2. Plain HTTP (No SSL on Port 80)
+If you want to serve public traffic over unencrypted HTTP without SSL certificate generation:
+
 ```nix
 services.caddy.extraConfig = ''
-  {
-    email admin@yourdomain.com
+  # Prefix the domain with http:// to disable automatic HTTPS for this host
+  http://public-mirror.yourdomain.com {
+    reverse_proxy 127.0.0.1:8080
   }
 
-  api.yourdomain.com {
-    reverse_proxy 127.0.0.1:4000
-  }
+  # Or globally disable auto-HTTPS in the global block:
+  # {
+  #   auto_https off
+  # }
 '';
 ```
 
 ---
 
-## 🏠 Part 2: Local LAN, Private Networks & Internal Domains
+## 🏠 Scenario B: Local Network (Private LAN, VPN & Homelab)
 
-When running services inside a Homelab, Tailscale/NetBird mesh, or private LAN without a public IP:
+### 1. HTTPS with Auto-Generated Self-Signed SSL (`tls internal`)
+Caddy contains an embedded Certificate Authority (CA) that **automatically generates, signs, and renews self-signed SSL certificates** on the fly for local domains (`.lan`, `.local`) or private LAN/VPN IPs without requiring manual OpenSSL commands:
 
-### 1. Automatic Local HTTPS (`tls internal`)
-Caddy generates its own local Root Certificate Authority (CA) and issues self-signed HTTPS certificates for `.lan`, `.local`, or internal domains:
 ```nix
 services.caddy.extraConfig = ''
-  # Local domain with internal trusted TLS
+  # Auto-generated self-signed SSL for local .lan domain
   dashboard.local.lan {
     tls internal
     reverse_proxy 127.0.0.1:9000
   }
 
-  # Tailscale / NetBird private IP with internal TLS
-  100.64.0.5:8443 {
+  # Auto-generated self-signed SSL for private IP / custom port
+  192.168.1.100:8443 {
     tls internal
     reverse_proxy 127.0.0.1:8080
   }
 '';
 ```
 
-### 2. Pure Plain HTTP (No SSL / Port 80)
-If you only want unencrypted HTTP for local development or behind an internal VPN:
+> **Tip:** Caddy saves its auto-generated local root certificate in `/var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt`. You can import this root CA into your client browser or OS to make your self-signed certs trusted without security warnings.
+
+### 2. Plain HTTP (Local LAN & IP Whitelist)
+Unencrypted HTTP for internal network access:
+
 ```nix
 services.caddy.extraConfig = ''
-  # Explicitly bind to port 80 or prefix with http://
-  http://vault.local.lan {
-    reverse_proxy 127.0.0.1:8200
+  # Local domain on plain HTTP (port 80)
+  http://nas.local.lan {
+    reverse_proxy 127.0.0.1:5000
   }
 
-  # Direct IP:Port binding
+  # Custom LAN port binding with IP subnet restriction
   :8080 {
-    reverse_proxy 127.0.0.1:3000
-  }
-'';
-```
-
-### 3. Restricting Access to Local Subnets
-```nix
-services.caddy.extraConfig = ''
-  admin.local.lan {
-    @blocked not remote_ip 192.168.1.0/24 10.0.0.0/8 127.0.0.1
-    respond @blocked "Forbidden" 403
-
-    reverse_proxy 127.0.0.1:9090
+    @localnet remote_ip 192.168.1.0/24 10.0.0.0/8 127.0.0.1
+    handle @localnet {
+      reverse_proxy 127.0.0.1:8080
+    }
+    respond "Access Denied" 403
   }
 '';
 ```

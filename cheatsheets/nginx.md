@@ -1,23 +1,23 @@
-# Nginx Configuration Cheatsheet
+# Nginx Proxy Cheatsheet
 
-This guide covers configuring **Nginx** in Nixy for both **Public Domains (via Let's Encrypt / ACME)** and **Local LAN / Private Networks (Plain HTTP, Custom Ports & Self-Signed Certs)**.
+This cheatsheet provides practical, copy-pasteable configuration patterns for **Nginx** across four core network scenarios.
 
 ---
 
-## 🌐 Part 1: Public SSL Configuration (Internet-Facing)
+## 🌐 Scenario A: Public Network (Internet-Facing)
 
-NixOS natively integrates `security.acme` with `services.nginx.virtualHosts` to automatically request and renew certificates.
+### 1. HTTPS with Automatic SSL (Let's Encrypt / ACME)
+NixOS natively provisions and renews SSL certificates using `security.acme`.
 
-### 1. Reverse Proxy with Automated Let's Encrypt SSL
-Edit `proxies/nginx.nix`:
+In `proxies/nginx.nix`:
 ```nix
 services.nginx.virtualHosts."app.yourdomain.com" = {
-  enableACME = true;
-  forceSSL = true;
+  enableACME = true; # Request Let's Encrypt certificate
+  forceSSL = true;   # Automatically redirect port 80 (HTTP) to port 443 (HTTPS)
 
   locations."/" = {
     proxyPass = "http://127.0.0.1:3000";
-    proxyWebsockets = true; # Enable WebSocket headers (Upgrade & Connection)
+    proxyWebsockets = true; # Handle WebSocket headers (Upgrade & Connection)
     extraConfig = ''
       proxy_set_header Host $host;
       proxy_set_header X-Real-IP $remote_addr;
@@ -28,66 +28,66 @@ services.nginx.virtualHosts."app.yourdomain.com" = {
 };
 ```
 
-### 2. Static File Serving with SSL
+### 2. Plain HTTP (No SSL on Public Port 80)
+If you want to serve public web traffic without SSL:
+
 ```nix
-services.nginx.virtualHosts."docs.yourdomain.com" = {
-  enableACME = true;
-  forceSSL = true;
-  root = "/var/www/docs";
-};
-```
+services.nginx.virtualHosts."public-mirror.yourdomain.com" = {
+  enableACME = false;
+  forceSSL = false;
 
----
-
-## 🏠 Part 2: Local LAN, Private Networks & Internal Domains
-
-### 1. Plain HTTP Virtual Host for `.lan` or `.local`
-```nix
-services.nginx.virtualHosts."dashboard.local.lan" = {
-  # No SSL / HTTP Only on Port 80
   locations."/" = {
     proxyPass = "http://127.0.0.1:8080";
   };
 };
 ```
 
-### 2. Virtual Host Bound to Specific LAN IP / Custom Port
-```nix
-services.nginx.virtualHosts."192.168.1.100" = {
-  listen = [
-    { addr = "192.168.1.100"; port = 8080; }
-  ];
-  locations."/" = {
-    proxyPass = "http://127.0.0.1:9000";
-  };
-};
-```
+---
 
-### 3. Using Custom Self-Signed SSL Certificates
-If you generated a private certificate (e.g. via `mkcert` or `openssl`):
+## 🏠 Scenario B: Local Network (Private LAN, VPN & Homelab)
+
+### 1. HTTPS with Self-Signed / Custom SSL Certificate
+For `.lan`, `.local`, or internal mesh networks where Let's Encrypt cannot verify domain ownership.
+
+In `proxies/nginx.nix`:
 ```nix
-services.nginx.virtualHosts."secure.local.lan" = {
-  addSSL = true;
+services.nginx.virtualHosts."dashboard.local.lan" = {
+  addSSL = true; # Enable SSL on 443 without ACME
   sslCertificate = "/var/lib/ssl/local.crt";
   sslCertificateKey = "/var/lib/ssl/local.key";
 
   locations."/" = {
-    proxyPass = "http://127.0.0.1:4000";
+    proxyPass = "http://127.0.0.1:9000";
+    proxyWebsockets = true;
   };
 };
 ```
 
-### 4. Restricting Access to Local Subnets
+### 2. Plain HTTP (Local LAN, Port Binding & Subnet Whitelist)
+Unencrypted HTTP virtual host bound to local domains or specific LAN IP addresses.
+
 ```nix
-services.nginx.virtualHosts."internal.local.lan" = {
+# Virtual Host for internal .lan domain
+services.nginx.virtualHosts."nas.local.lan" = {
   locations."/" = {
     proxyPass = "http://127.0.0.1:5000";
     extraConfig = ''
+      # Restrict access to local private network subnets only
       allow 192.168.1.0/24;
       allow 10.0.0.0/8;
       allow 127.0.0.1;
       deny all;
     '';
+  };
+};
+
+# Virtual Host bound to a specific LAN IP and custom port
+services.nginx.virtualHosts."192.168.1.100" = {
+  listen = [
+    { addr = "192.168.1.100"; port = 8080; }
+  ];
+  locations."/" = {
+    proxyPass = "http://127.0.0.1:8080";
   };
 };
 ```

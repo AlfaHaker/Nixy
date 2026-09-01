@@ -31,7 +31,7 @@ Instead of writing sprawling, interdependent Nix configurations, **Nixy** centra
 ├── systempackages.nix          # Diagnostic, sysadmin & networking CLI packages (with explanations)
 ├── containers/
 │   ├── default.nix
-│   ├── docker.nix              # Enabled when containers.docker = tru e
+│   ├── docker.nix              # Enabled when containers.docker = true
 │   └── incus.nix               # Enabled when containers.incus = true
 ├── proxies/
 │   ├── default.nix

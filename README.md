@@ -126,19 +126,19 @@ Follow these steps when installing NixOS and Nixy from the official [NixOS Minim
 
 ```bash
 # 1. Partition the disk (e.g. /dev/nvme0n1 or /dev/sda)
-parted /dev/sda -- mklabel gpt
-parted /dev/sda -- mkpart ESP fat32 1MiB 512MiB
-parted /dev/sda -- set 1 esp on
-parted /dev/sda -- mkpart primary ext4 512MiB 100%
+sudo parted /dev/sda -- mklabel gpt
+sudo parted /dev/sda -- mkpart ESP fat32 1MiB 512MiB
+sudo parted /dev/sda -- set 1 esp on
+sudo parted /dev/sda -- mkpart primary ext4 512MiB 100%
 
 # 2. Format partitions
-mkfs.fat -F 32 -L boot /dev/sda1
-mkfs.ext4 -L nixos /dev/sda2
+sudo mkfs.fat -F 32 -n boot /dev/sda1
+sudo mkfs.ext4 -L nixos /dev/sda2
 
 # 3. Mount filesystems
-mount /dev/disk/by-label/nixos /mnt
-mkdir -p /mnt/boot
-mount /dev/disk/by-label/boot /mnt/boot
+sudo mount /dev/disk/by-label/nixos /mnt
+sudo mkdir -p /mnt/boot
+sudo mount /dev/disk/by-label/boot /mnt/boot
 ```
 
 #### Step 2: Clone Nixy Configuration

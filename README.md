@@ -31,7 +31,7 @@ Instead of writing sprawling, interdependent Nix configurations, **Nixy** centra
 ├── systempackages.nix          # Diagnostic, sysadmin & networking CLI packages (with explanations)
 ├── containers/
 │   ├── default.nix
-│   ├── docker.nix              # Enabled when containers.docker = true
+│   ├── docker.nix              # Enabled when containers.docker = tru e
 │   └── incus.nix               # Enabled when containers.incus = true
 ├── proxies/
 │   ├── default.nix
@@ -117,6 +117,7 @@ Nixy allows **Docker** and **Incus** to run side-by-side without network isolati
 Follow these steps when installing NixOS and Nixy from the official [NixOS Minimal ISO](https://nixos.org/download.html).
 
 #### Step 1: Partition, Format, and Mount
+
 *(Example for UEFI / GPT with Ext4)*:
 
 ```bash
@@ -137,23 +138,27 @@ mount /dev/disk/by-label/boot /mnt/boot
 ```
 
 #### Step 2: Clone Nixy Configuration
+
 ```bash
 # Clone Nixy repository directly into /mnt/etc/nixos
 git clone https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
 ```
 
 #### Step 3: Generate Hardware Configuration
+
 ```bash
 # Generate hardware configuration inside /mnt/etc/nixos
 nixos-generate-config --root /mnt
 ```
 
 #### Step 4: Customize Variables & SSH Keys
+
 1. Open `/mnt/etc/nixos/variables.nix` and configure your `hostname`, `username`, `timezone`, and `swap` settings.
 2. Open `/mnt/etc/nixos/users.nix` and `/mnt/etc/nixos/ssh.nix` to insert your public SSH keys.
 3. Toggle container engines (`docker`, `incus`), proxy (`caddy`, `traefik`, `nginx`, `none`), and shell preference.
 
 #### Step 5: Install & Reboot
+
 ```bash
 nixos-install
 reboot
@@ -169,11 +174,13 @@ reboot
 If you already have a running NixOS installation (e.g., a VPS cloud image or a fresh minimal install) and want to apply Nixy:
 
 #### Step 1: Backup Existing Configuration
+
 ```bash
 sudo cp -r /etc/nixos /etc/nixos.bak
 ```
 
 #### Step 2: Clone Nixy & Preserve Hardware Configuration
+
 ```bash
 # Move hardware-configuration.nix temporarily
 sudo mv /etc/nixos/hardware-configuration.nix /tmp/hardware-configuration.nix
@@ -187,10 +194,12 @@ sudo mv /tmp/hardware-configuration.nix /etc/nixos/hardware-configuration.nix
 ```
 
 #### Step 3: Customize Variables & User
+
 1. Open `/etc/nixos/variables.nix` and set your `hostname`, `username`, `timezone`, `swap`, and feature toggles.
 2. Open `/etc/nixos/users.nix` and `/etc/nixos/ssh.nix` to verify your user and SSH keys.
 
 #### Step 4: Build & Switch
+
 ```bash
 # Test build first (optional)
 sudo nixos-rebuild test

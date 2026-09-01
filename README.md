@@ -31,6 +31,10 @@ Instead of writing sprawling, interdependent Nix configurations, **Nixy** centra
 │   ├── ssh.nix                 # Hardened OpenSSH daemon settings
 │   ├── services.nix            # Fail2ban, QEMU agent, timesyncd, log retention
 │   └── systempackages.nix      # Diagnostic, sysadmin & networking CLI packages (with explanations)
+├── cheatsheets/                # Quick-reference guides for Public SSL & Local LAN proxy setups
+│   ├── caddy.md
+│   ├── traefik.md
+│   └── nginx.md
 ├── containers/
 │   ├── default.nix
 │   ├── docker.nix              # Enabled when containers.docker = true
@@ -86,7 +90,7 @@ Open `variables.nix` and set your desired environment:
 
   # 5. Shell Stack ("zsh" | "bash" | "fish")
   shell = "zsh";
-  zellij = true;            # Terminal multiplexer
+  zellij = false;           # Terminal multiplexer
   herdr = true;             # Herdr agent runtime & workspace manager
   header = true;            # Fastfetch MOTD banner
 }
@@ -100,12 +104,24 @@ Nixy allows **Docker** and **Incus** to run side-by-side without network isolati
 
 1. **Docker Engine**: Designed for OCI microservices, Docker Compose stacks, and developer workflows.
    - **Storage**: Managed by default in `/var/lib/docker` (or customized via `dockerDataRoot`).
-   - **Log Protection**: Docker log rotation settings can be enabled in [containers/docker.nix](file:///mnt/Storage1/Projects/OS/NixOs/Nixy/containers/docker.nix) to cap log growth at ~60 MB per container (20 MB x 3 files), preventing disk exhaustion.
+   - **Log Protection**: Docker log rotation settings can be enabled in [containers/docker.nix](containers/docker.nix) to cap log growth at ~60 MB per container (20 MB x 3 files), preventing disk exhaustion.
 2. **Incus Virtualization**: Designed for full Linux system containers (LXC) and complete virtual machines (KVM).
    - Managed via `incus` CLI and isolated storage pools.
 3. **Seamless Networking**:
-   - Kernel IP packet forwarding (`net.ipv4.ip_forward = 1` and `net.ipv6.conf.all.forwarding = 1`) is enabled in [network/network.nix](file:///mnt/Storage1/Projects/OS/NixOs/Nixy/network/network.nix).
-   - Both `docker0` and `incusbr0` bridges are dynamically trusted in [network/firewall.nix](file:///mnt/Storage1/Projects/OS/NixOs/Nixy/network/firewall.nix), preventing Docker iptables rules from blocking Incus bridge traffic.
+   - Kernel IP packet forwarding (`net.ipv4.ip_forward = 1` and `net.ipv6.conf.all.forwarding = 1`) is enabled in [network/network.nix](network/network.nix).
+   - Both `docker0` and `incusbr0` bridges are dynamically trusted in [network/firewall.nix](network/firewall.nix), preventing Docker iptables rules from blocking Incus bridge traffic.
+
+---
+
+## 🌐 Reverse Proxy Stack & Guides
+
+Nixy supports modular, production-ready reverse proxies with automated Let's Encrypt SSL and local LAN / private network setups.
+
+For complete, copy-pasteable configuration guides covering **Public Let's Encrypt SSL**, **Docker Discovery Labels**, **Local LAN Domains (`.lan`)**, **Self-Signed Certificates**, and **Plain HTTP**, check the cheatsheets:
+
+* 📖 **[Caddy Cheatsheet](cheatsheets/caddy.md)** — Auto-HTTPS, internal trusted CA (`tls internal`), and plain HTTP.
+* 📖 **[Traefik Cheatsheet](cheatsheets/traefik.md)** — Docker labels, ACME certresolvers, middleware IP whitelists, and dynamic routers.
+* 📖 **[Nginx Cheatsheet](cheatsheets/nginx.md)** — `security.acme` automation, custom SSL certs, and LAN subnets.
 
 ---
 

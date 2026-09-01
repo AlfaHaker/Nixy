@@ -118,6 +118,10 @@ Follow these steps when installing NixOS and Nixy from the official [NixOS Minim
 
 #### Step 1: Partition, Format, and Mount
 
+> [!WARNING]
+> **Data Loss Warning:** The commands below will **completely wipe and partition** the target drive (e.g. `/dev/sda` or `/dev/nvme0n1`). Double-check your drive identity using `lsblk` before proceeding.
+> For an in-depth reference on custom layouts (Btrfs, ZFS, LVM, or Swap partitions), see the [Official NixOS Partitioning Guide](https://nixos.org/manual/nixos/stable/#sec-installation-partitioning) and [ArchWiki Partitioning](https://wiki.archlinux.org/title/Partitioning).
+
 *(Example for UEFI / GPT with Ext4)*:
 
 ```bash

@@ -7,16 +7,12 @@ in {
   _module.args = { inherit vars; };
 
   imports = [ 
-    ./hardware-configuration.nix
-    ./users.nix
-    ./ssh.nix
-    ./services.nix
-    ./systempackages.nix
+    ./system
     ./network
     ./containers
     ./proxies
     ./tty
-  ] ++ (if (vars ? swap && vars.swap.enable) then [ ./swap.nix ] else [ ]);
+  ];
 
   # Basic System Settings
   system.stateVersion = vars.stateVersion;

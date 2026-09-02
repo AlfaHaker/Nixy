@@ -8,14 +8,4 @@
     ui.enable = false;
   };
 
-  # Incus client tools and kernel network capabilities
-  environment.systemPackages = with pkgs; [
-    incus
-  ];
-
-  # Enable packet forwarding for Incus network bridges
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
-    "net.ipv6.conf.all.forwarding" = 1;
-  };
 }

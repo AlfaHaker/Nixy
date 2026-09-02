@@ -1,5 +1,5 @@
 # tty/header.nix - Fastfetch System Info MOTD Banner
-{ config, pkgs, lib, vars, ... }:
+{ config, pkgs, ... }:
 
 {
   environment.systemPackages = [ pkgs.fastfetch ];

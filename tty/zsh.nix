@@ -1,5 +1,5 @@
 # tty/zsh.nix - Zsh Shell Configuration
-{ config, pkgs, lib, vars, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   programs.zsh = {

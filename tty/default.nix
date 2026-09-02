@@ -8,6 +8,5 @@ in {
      else if vars.shell == "zsh" then [ ./zsh.nix ]
      else if vars.shell == "fish" then [ ./fish.nix ]
      else [ ])
-    ++ (if ((vars ? zellij && vars.zellij) || (vars ? herdr && vars.herdr)) then [ ./multiplexer.nix ] else [ ])
     ++ (if (vars ? header && vars.header) then [ ./header.nix ] else [ ]);
 }

@@ -1,5 +1,5 @@
 # tty/bash.nix - Bash Shell Configuration
-{ config, pkgs, lib, vars, ... }:
+{ config, pkgs, ... }:
 
 {
   programs.bash = {

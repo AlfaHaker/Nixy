@@ -1,31 +1,43 @@
 # systempackages.nix - System-wide packages and utilities with explanations
-{ config, pkgs, ... }:
+{ config, pkgs, vars, ... }:
 
 {
   # Optional System-wide packages - Uncomment any packages you wish to install:
   environment.systemPackages = with pkgs; [
     # --- Core CLI & Text Editors ---
-    # neovim          # Modern, extensible Vim-fork text editor for configuration editing
-    # nano            # Simple, beginner-friendly command-line text editor
-    # git             # Version control system for managing code repositories and dotfiles
-    # curl            # Command-line tool for transferring data with URLs (HTTP, HTTPS, FTP)
-    # wget            # Network utility to retrieve files from the web via HTTP/HTTPS/FTP
-    # rsync           # Fast, versatile remote and local file-copying and synchronization tool
-    # tree            # Recursive directory listing program that produces a depth-indented file tree
+    neovim          # Modern, extensible Vim-fork text editor for configuration editing
+    nano            # Simple, beginner-friendly command-line text editor
+    git             # Version control system for managing code repositories and dotfiles
+    curl            # Command-line tool for transferring data with URLs (HTTP, HTTPS, FTP)
+    wget            # Network utility to retrieve files from the web via HTTP/HTTPS/FTP
+    rsync           # Fast, versatile remote and local file-copying and synchronization tool
+    tree            # Recursive directory listing program that produces a depth-indented file tree
     # jq              # Lightweight and flexible command-line JSON processor and filter
     # ripgrep         # Ultra-fast line-oriented search tool (rg) that respects .gitignore
     # fd              # Fast, user-friendly alternative to find with colorized output
-    # bat             # Modern cat replacement with syntax highlighting and Git integration
+    bat             # Modern cat replacement with syntax highlighting and Git integration
     # eza             # Modern, feature-rich replacement for ls with colors and icons
     # nvd             # Nix/NixOS package version diff tool (powers the sysdiff alias)
     # which           # Shows the full path of shell commands
-    # file            # Utility to determine file type based on binary headers/magic numbers
+    file            # Utility to determine file type based on binary headers/magic numbers
     # unzip           # Extraction tool for ZIP archives
     # p7zip           # Command-line port of 7-Zip file archiver with high compression
-    # tar             # Archiving utility to create, maintain, and extract tape/tar archives
+    tar             # Archiving utility to create, maintain, and extract tape/tar archives
+    zstd            # Zstandard data compression algorithm
+
+    ( # Herdr Agent runtime & terminal manager
+      if vars.herdr
+      then herdr
+      else git
+    )
+    ( # Zellij terminal multiplexer
+      if vars.zellij
+      then zellij
+      else git
+    )
 
     # --- System Monitoring & Resource Analysis ---
-    # htop            # Interactive and colorful process viewer and system monitor
+    htop            # Interactive and colorful process viewer and system monitor
     # btop            # Modern, aesthetically pleasing terminal resource monitor (CPU, memory, disks, network)
     # iotop           # Top-like I/O monitor to identify processes performing heavy disk reads/writes
     # iftop           # Real-time console bandwidth monitor for listening on network interfaces

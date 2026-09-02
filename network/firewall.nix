@@ -4,6 +4,7 @@ let
   enableDocker = vars.containers ? docker && vars.containers.docker;
   enableIncus = vars.containers ? incus && vars.containers.incus;
 in {
+  networking.nftables.enable = true;
   networking.firewall = {
     enable = true;
     allowPing = true;

@@ -1,7 +1,8 @@
 # tty/default.nix - Shell & Terminal Stack Coordinator
-{ lib, vars, ... }:
-
-{
+{ lib, ... }:
+let
+  vars = import ../variables.nix;
+in {
   imports =
     (if vars.shell == "bash" then [ ./bash.nix ]
      else if vars.shell == "zsh" then [ ./zsh.nix ]

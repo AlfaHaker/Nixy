@@ -162,17 +162,17 @@ sudo mount /dev/disk/by-label/boot /mnt/boot --mkdir
 
 ```bash
 # Clone Nixy repository (main branch by default):
-git clone https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
+sudo git clone https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
 
 # Or clone the cutting-edge dev branch:
-# git clone -b dev https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
+# sudo git clone -b dev https://github.com/AlfaHaker/Nixy.git /mnt/etc/nixos
 ```
 
 #### Step 3: Generate Hardware Configuration
 
 ```bash
 # Generate hardware configuration inside /mnt/etc/nixos/system
-nixos-generate-config --root /mnt --dir /mnt/etc/nixos/system
+sudo nixos-generate-config --root /mnt --dir /mnt/etc/nixos/system
 ```
 
 #### Step 4: Customize Variables & SSH Keys
@@ -184,7 +184,7 @@ nixos-generate-config --root /mnt --dir /mnt/etc/nixos/system
 #### Step 5: Install & Reboot
 
 ```bash
-nixos-install
+sudo nixos-install
 reboot
 ```
 
